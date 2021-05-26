@@ -24,6 +24,31 @@ import tensorflow as tf
 import time
 import collections
 
+import sys
+import glob
+
+# import carla path
+from carla_config import config
+
+carla_version = config['carla_version']
+root_path = config['root_path']
+
+carla_root = os.path.join(root_path, 'CARLA_' + carla_version)
+carla_path = os.path.join(carla_root, 'PythonAPI')
+sys.path.append(carla_path)
+sys.path.append(os.path.join(carla_root, 'PythonAPI/carla'))
+sys.path.append(os.path.join(carla_root, 'PythonAPI/carla/agents'))
+
+try:
+    sys.path.append(glob.glob(carla_path + '/carla/dist/carla-*%d.%d-%s.egg' % (
+        sys.version_info.major,
+        sys.version_info.minor,
+        'win-amd64' if os.name == 'nt' else 'linux-x86_64'))[0])
+except IndexError:
+    pass
+
+import carla
+
 import gym
 import gym_carla
 
@@ -363,6 +388,7 @@ def train_eval(
         gpu_allow_growth=True,  # GPU memory growth
         gpu_memory_limit=None,  # GPU memory limit
         action_repeat=1):  # Name of single observation channel, ['camera', 'lidar', 'birdeye']
+
     # Setup GPU
     gpus = tf.config.experimental.list_physical_devices('GPU')
     if gpu_allow_growth:
