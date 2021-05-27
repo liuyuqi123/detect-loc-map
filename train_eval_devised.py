@@ -189,6 +189,11 @@ def compute_summaries(metrics,
                       image_keys=None,
                       pixor_size=128,
                       pixor_metrics=True):
+
+    """
+    This func is supposed to
+
+    """
     for metric in metrics:
         metric.reset()
 
@@ -562,6 +567,7 @@ def train_eval(
                 experience, _ = next(iterator)
                 return tf_agent.train(experience)
 
+            # todo check if this is a instance
             train_step = common.function(train_step)
 
             # Start training
@@ -611,3 +617,18 @@ if __name__ == '__main__':
     flags.mark_flag_as_required('root_dir')
     flags.mark_flag_as_required('experiment_name')
     app.run(main)
+
+    """
+    # original .sh file
+    
+    CUDA_VISIBLE_DEVICES=0 python train_eval.py \
+  --root_dir logs \
+  --experiment_name e2e_perception \
+  --gin_file params.gin \
+  --gin_param load_carla_env.port=2000 \
+  --gin_param train_eval.model_batch_size=32 \
+  --gin_param train_eval.obs_size=128 \
+  --gin_param train_eval.pixor_size=128 \
+  --gin_param train_eval.sequence_length=10 
+  
+    """
