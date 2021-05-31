@@ -429,6 +429,8 @@ def train_eval(
     # Whether to record for summary
     with tf.summary.record_if(
             lambda: tf.math.equal(global_step % summary_interval, 0)):
+
+        # todo check how to generate 2 parallel carla env
         # Create Carla environment
         py_env, eval_py_env = load_carla_env(env_name='carla-v0', lidar_bin=32 / obs_size, pixor_size=pixor_size,
                                              obs_channels=list(
@@ -449,6 +451,8 @@ def train_eval(
             model_network_ctor = sequential_latent_pixor_network.PixorSLMHierarchical
         else:
             raise NotImplementedError
+
+        # init a instance of model nn
         model_net = model_network_ctor(
             input_names, reconstruct_names, obs_size=obs_size, pixor_size=pixor_size,
             reconstruct_pixor_state=reconstruct_pixor_state, perception_weight=perception_weight)
@@ -460,6 +464,7 @@ def train_eval(
             desired_speed=9
         )
 
+        # this is the RL agent, consist of all NN
         tf_agent = perception_agent.PerceptionAgent(
             time_step_spec,
             action_spec,
@@ -480,6 +485,9 @@ def train_eval(
         average_return = tf_metrics.AverageReturnMetric(
             buffer_size=num_eval_episodes,
             batch_size=tf_env.batch_size)
+
+        # todo check the usage of metrics
+        #  - to plot curves? or evaluation
         train_metrics = [
             tf_metrics.NumberOfEpisodes(),
             env_steps,
@@ -573,6 +581,8 @@ def train_eval(
             # Start training
             for iteration in range(num_iterations):
 
+                # todo 训练过程中RL agent是否和环境持续地交互？
+
                 loss = train_step()
 
                 # Log training information
@@ -619,16 +629,16 @@ if __name__ == '__main__':
     app.run(main)
 
     """
-    # original .sh file
+    # original .sh file cmd line
     
-    CUDA_VISIBLE_DEVICES=0 python train_eval.py \
-  --root_dir logs \
-  --experiment_name e2e_perception \
-  --gin_file params.gin \
-  --gin_param load_carla_env.port=2000 \
-  --gin_param train_eval.model_batch_size=32 \
-  --gin_param train_eval.obs_size=128 \
-  --gin_param train_eval.pixor_size=128 \
-  --gin_param train_eval.sequence_length=10 
+        CUDA_VISIBLE_DEVICES=0 python train_eval.py \
+      --root_dir logs \
+      --experiment_name e2e_perception \
+      --gin_file params.gin \
+      --gin_param load_carla_env.port=2000 \
+      --gin_param train_eval.model_batch_size=32 \
+      --gin_param train_eval.obs_size=128 \
+      --gin_param train_eval.pixor_size=128 \
+      --gin_param train_eval.sequence_length=10 
   
     """
