@@ -99,7 +99,7 @@ FLAGS = flags.FLAGS
 def load_carla_env(
         env_name='carla-v0',
         discount=1.0,
-        number_of_vehicles=100,
+        number_of_vehicles=100,  # 100
         number_of_walkers=0,
         display_size=256,
         max_past_step=1,
@@ -395,7 +395,8 @@ def train_eval(
         action_repeat=1):  # Name of single observation channel, ['camera', 'lidar', 'birdeye']
 
     # Setup GPU
-    gpus = tf.config.experimental.list_physical_devices('GPU')
+    gpus = tf.config.experimental.list_physical_devices(device_type='GPU')
+
     if gpu_allow_growth:
         for gpu in gpus:
             tf.config.experimental.set_memory_growth(gpu, True)
